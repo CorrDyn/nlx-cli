@@ -67,9 +67,9 @@ class Runner:
         if not client.is_authorized:
             rich.print("[red]Client could not be authenticated. Please ensure you have set NLX_API_KEY.[/red]")
             return
-        not (yes or confirm(f"There are {len(ops)} OPS defined in this module. Would you like to continue?")) and exit(
-            1
-        )
+        not (
+            yes or confirm(f"There are {len(ops)} OPS defined in this module. Would you like to continue?", default="y")
+        ) and exit(1)
 
         for method, kwargs in ops:
             op = getattr(client, method)

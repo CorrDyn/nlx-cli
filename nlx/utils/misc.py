@@ -6,9 +6,13 @@ from rich.prompt import Prompt
 from nlx.utils.module_loading import cached_import
 
 
-def confirm(question, color="cyan"):
-    response = Prompt.ask(f"[{color}]{question} (y/N)#[/{color}]")
-    return response.lower() in ["y", "yes"]
+def confirm(question, color="cyan", default="n"):
+    default = default.lower()
+    yes = ["y", "yes"]
+    prompt = "(Y/n)" if default in yes else "(y/N)"
+    response = Prompt.ask(f"[{color}]{question} {prompt}[/{color}]")
+    response = response.lower() if response else default
+    return response in ["y", "yes"]
 
 
 def basic_logger(name, level):
