@@ -34,7 +34,7 @@ import sys
 from importlib import import_module
 
 
-def cached_import(module_path, class_name):
+def cached_import(module_path, class_name=None):
     modules = sys.modules
     if module_path not in modules or (
         # Module is not fully initialized.
@@ -42,7 +42,9 @@ def cached_import(module_path, class_name):
         and getattr(modules[module_path].__spec__, "_initializing", False) is True
     ):
         import_module(module_path)
-    return getattr(modules[module_path], class_name)
+    if class_name:
+        return getattr(modules[module_path], class_name)
+    return modules[module_path]
 
 
 def import_string(dotted_path):
@@ -59,3 +61,9 @@ def import_string(dotted_path):
         return cached_import(module_path, class_name)
     except AttributeError as err:
         raise ImportError('Module "%s" does not define a "%s" attribute/class' % (module_path, class_name)) from err
+
+
+def import_or_object(dotted_path_or_obj):
+    if isinstance(dotted_path_or_obj, str):
+        return import_string(dotted_path_or_obj)
+    return dotted_path_or_obj
