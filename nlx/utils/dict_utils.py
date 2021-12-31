@@ -50,43 +50,6 @@ class DictNamespace(dict):
         DictNamespace.construct_namespace(self)
 
 
-class Undefined:
-    def __bool__(self):
-        return False
-
-    def __eq__(self, other):
-        return False
-
-    def __lt__(self, other):
-        return False
-
-    def __gt__(self, other):
-        return False
-
-    def __getattribute__(self, item):
-        return Undefined()
-
-    def __str__(self):
-        return "Undefined"
-
-
-class JSLike(DictNamespace):
-    """
-    DictNamespace that returns Undefined for attempted access
-    of missing attributes. Very similar to how JavaScript
-    behaves.
-    """
-
-    def __getattr__(self, key):
-        if key not in self:
-            return Undefined()
-        return self[key]
-
-    def __init__(self, **kwargs):
-        dict.__init__(self, **kwargs)
-        JSLike.construct_namespace(self)
-
-
 def get_all(dict_obj, *keys):
     return tuple(dict_obj.get(key, None) for key in keys)
 

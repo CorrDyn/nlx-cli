@@ -48,6 +48,11 @@ session.params.update(dict(timeout=10))
 
 
 class BaseClient:
+    """
+    Provides wrappers around requests.get and requests.post which automatically patiently
+    waits in the case of response throttling.
+    """
+
     _is_authorized = None
 
     @property

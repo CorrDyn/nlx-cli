@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import json
 import os
 import sys
 
@@ -6,6 +7,7 @@ import fire
 import rich
 
 from nlx.client import AsyncReport
+from nlx.conf import settings
 from nlx.utils.misc import confirm
 from nlx.utils.module_loading import cached_import, import_string
 
@@ -13,7 +15,8 @@ from nlx.utils.module_loading import cached_import, import_string
 class Runner:
     async_report = AsyncReport
 
-    def run(self, run_config, yes=False):
+    @staticmethod
+    def run(run_config, yes=False):
         """
         Execute a python module as a series of API Calls
         :param run_config: python import module path containing the run config
@@ -36,10 +39,16 @@ class Runner:
             op = getattr(client, method)
             op(**kwargs)
 
+    @staticmethod
+    def config():
+        """
+        Display the current config as json
+        :return:
+        """
+        return json.dumps(settings.env, indent=2, default=str)
+
 
 def main():
-    from nlx.conf import settings
-
     fire.Fire(Runner)
 
 

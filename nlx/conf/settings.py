@@ -1,3 +1,8 @@
+"""
+Load configuration from the environment and/or the environment file specified at NLX_ENV_PATH.
+This module should be imported before any attempted API usage.
+"""
+
 import logging
 import os
 import sys
@@ -7,6 +12,7 @@ import dotenv
 import rich
 
 from nlx.utils.dict_utils import DictNamespace
+from nlx.utils.misc import URL
 from nlx.utils.module_loading import cached_import
 from nlx.utils.settings_utils import once, string_to_bool, string_to_list
 
@@ -15,9 +21,9 @@ DEFAULTS = DictNamespace(
     NLX_SUPPRESS_ENV_NOTICE=False,
     NLX_LOG_LEVEL="DEBUG",
     NLX_API_KEY="12",
-    NLX_API_URL="https://api.nlxresearchhub.org",
+    NLX_API_URL=URL("https://api.nlxresearchhub.org"),
     NLX_REPORT_HISTORY_STORAGE=Path("nlx.pickle"),
-    NLX_REPORT_DOWNLOAD_DIR=".reports",
+    NLX_REPORT_DOWNLOAD_DIR=Path(".reports"),
 )
 
 logger = logging.getLogger(__name__)
@@ -42,6 +48,7 @@ def get_runtime_parameters(defaults):
 
 env = get_runtime_parameters(DEFAULTS)
 
+env.NLX_ENV_PATH = NLX_ENV_PATH
 NLX_SUPPRESS_ENV_NOTICE = env.NLX_SUPPRESS_ENV_NOTICE
 NLX_LOG_LEVEL = env.NLX_LOG_LEVEL
 NLX_API_KEY = env.NLX_API_KEY
