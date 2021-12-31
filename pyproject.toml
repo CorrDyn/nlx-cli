@@ -3,7 +3,7 @@ name = "nlx"
 version = "0.1.0"
 description = "Python SDK for interacting with the NLx API and other affiliated tools"
 authors = ["jjorissen52 <jjorissen52@gmail.com>"]
-license = "MIT"
+license = "NO_LICENSE"
 
 [tool.poetry.scripts]
 nlx = "nlx.main:main"
