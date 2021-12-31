@@ -24,7 +24,7 @@ logger = basic_logger(__name__, NLX_LOG_LEVEL)
 
 
 def format_url(url):
-    return f"{NLX_API_URL.strip('/')}/{url.strip('/')}/"
+    return f"{str(NLX_API_URL).strip('/')}/{url.strip('/')}/"
 
 
 def wait(func):
