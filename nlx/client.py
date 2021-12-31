@@ -168,8 +168,9 @@ class AsyncReport(BaseClient):
         else:
             response = self.post("api/job_reports", json=query)
             if response.status_code not in [requests.codes.ok, requests.codes.accepted]:
-                logger.error(f"Unexpected status code {response.status_code}")
-                return response.json()
+                response_json = response.json()
+                logger.error(f"Unexpected {response.status_code}: {json.dumps(response_json, indent=2)}")
+                return response_json
             response = response.json()
             self._save(response, creation=[response["data"][0]["uuid"], creation_args])
         if auto:
