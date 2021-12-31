@@ -2,7 +2,7 @@ import functools
 import json
 from types import SimpleNamespace
 
-from utils.misc import basic_logger
+from nlx.utils.misc import basic_logger
 
 logger = None
 

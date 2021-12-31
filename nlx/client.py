@@ -8,7 +8,6 @@ from pathlib import Path
 
 import fire
 import requests
-from utils.misc import basic_logger
 
 from nlx.conf.settings import (
     NLX_API_KEY,
@@ -18,6 +17,7 @@ from nlx.conf.settings import (
     NLX_REPORT_HISTORY_STORAGE,
 )
 from nlx.utils.dict_utils import as_json, get_all
+from nlx.utils.misc import basic_logger
 from nlx.utils.settings_utils import ALTERNATE_SEPARATOR
 
 logger = basic_logger(__name__, NLX_LOG_LEVEL)

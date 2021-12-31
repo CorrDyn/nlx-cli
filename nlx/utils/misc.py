@@ -2,7 +2,8 @@ import logging
 from urllib.parse import urlparse
 
 from rich.prompt import Prompt
-from utils.module_loading import cached_import
+
+from nlx.utils.module_loading import cached_import
 
 
 def confirm(question, color="cyan"):
