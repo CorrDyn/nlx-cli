@@ -3,6 +3,11 @@ import datetime
 import fire
 from dateutil.relativedelta import relativedelta
 
+from nlx.conf import settings
+from nlx.utils.misc import basic_logger
+
+logger = basic_logger(__name__, settings.NLX_LOG_LEVEL)
+
 
 class helpers:
     @staticmethod
@@ -18,10 +23,17 @@ class helpers:
         end = start + relativedelta(months=1)
         # increase the start and end one month at a time until we are in the next year
         # or until we reach an end date in the future
-        while start.year < year + 1 and end < datetime.date.today():
-            # the API filtering is inclusive on the start and exclusive on the end,
-            # e.g. the range [2021-03-01, 2021-04-01) will not include 2021-04-01.
-            dates.append(dict(start=start.strftime(format), end=end.strftime(format)))
+        while start.year < year + 1:
+            is_future = end > datetime.date.today()
+            if is_future:
+                logger.warning(
+                    f"Date range [{start.strftime(format)}, {end.strftime(format)}) contains dates in "
+                    f"the future and has been skipped."
+                )
+            else:
+                # the API filtering is inclusive on the start and exclusive on the end,
+                # e.g. the range [2021-03-01, 2021-04-01) will not include 2021-04-01.
+                dates.append(dict(start=start.strftime(format), end=end.strftime(format)))
             start += relativedelta(months=1)
             end += relativedelta(months=1)
         return dates
