@@ -34,6 +34,8 @@ for state in STATES:
 def error_handler(func, *args, **kwargs):
     try:
         return func(*args, **kwargs)
+    except KeyboardInterrupt:
+        raise
     except:  # noqa
         logger.exception(f"Something unexpected happened when executing func={func} args={args}, kwargs={kwargs}")
 
