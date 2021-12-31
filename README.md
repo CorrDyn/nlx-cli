@@ -1,10 +1,7 @@
 ## Installation
-Clone the repository and use pip to install it into a python environment, e.g.
+Install via pip
 ```bash
-git clone https://github.com/CorrDyn/nlx-cli
-python3.7 -m venv venv
-source ./venv/bin/activate
-pip install ./nlx-cli
+pip install nlx-cli
 ```
 
 ## Configuration
