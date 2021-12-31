@@ -29,13 +29,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 https://github.com/django/django/blob/main/django/utils/module_loading.py
 """
-
+import os
 import sys
 from importlib import import_module
+from pathlib import Path
+from typing import Optional, Union
 
 
-def cached_import(module_path, class_name=None):
+def path_as_module_path(path: Path):
+    """
+    Convert a path into a module path.
+    E.G.: examples/example_run_config.py => examples.example_run_config
+    :param path:
+    :return:
+    """
+    if path.suffix == ".py" and path.exists():
+        relpath = os.path.relpath(path)
+        return str(relpath).replace(os.sep, ".")[:-3]
+    return None
+
+
+def cached_import(module_path: Union[str, Path], class_name: Optional[str] = None):
     modules = sys.modules
+    from_file_path = path_as_module_path(Path(module_path))
+    if from_file_path:
+        module_path = from_file_path
     if module_path not in modules or (
         # Module is not fully initialized.
         getattr(modules[module_path], "__spec__", None) is not None
