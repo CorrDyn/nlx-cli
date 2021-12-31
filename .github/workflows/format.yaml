@@ -1,0 +1,23 @@
+name: Check Formatting and Imports
+on: push
+jobs:
+  format:
+    name: Ensure Correct Code Formatting and Import Order
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ 3.7 ]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          lfs: true
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Setup Environment
+        run: pip install poetry && poetry install
+      - name: Check with black
+        run: black --check .
+      - name: Check with isort
+        run: isort --check .
