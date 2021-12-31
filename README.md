@@ -40,7 +40,7 @@ and execute the command `nlx run example_run_config`. To preview the operations 
 ```python
 """
 This runner will create, await, and download async reports for all job listings
-compiled in the years 2017-2023 for Kansas.
+compiled in the years 2017-2022 for Kansas.
 
 You want to place this file in your current working directory or a location that
 is importable from your current python path.
@@ -55,7 +55,7 @@ logger = basic_logger(__name__, logging.DEBUG)
 # python module style import path of the Client class to be executed by the runner.
 RUNNER_CLIENT = "nlx.client.AsyncReport"
 
-# years 2017-2023, inclusive
+# years 2017-2022, inclusive
 YEARS = [*range(2017, 2023)]
 # Kansas
 STATES = ["KS"]
