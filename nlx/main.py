@@ -12,8 +12,23 @@ from nlx.utils.misc import confirm
 from nlx.utils.module_loading import cached_import, import_string
 
 
+def load_config(run_config):
+    # ensure modules in the user's current directory are importable
+    sys.path.insert(0, os.getcwd())
+    ClientClass = import_string(str(cached_import(run_config, "RUNNER_CLIENT")))
+    client = ClientClass()
+    ops = cached_import(run_config, "RUNNER_OPS")
+    return client, ops
+
+
 class Runner:
     async_report = AsyncReport
+
+    @staticmethod
+    def show_ops(run_config):
+        _, ops = load_config(run_config)
+        for op in ops:
+            print(json.dumps(op))
 
     @staticmethod
     def run(run_config, yes=False):
@@ -23,19 +38,15 @@ class Runner:
         :param yes: auto-confirm any prompts
         :return:
         """
-        # ensure modules in the user's current directory are importable
-        sys.path.insert(0, os.getcwd())
-        ClientClass = import_string(str(cached_import(run_config, "RUNNER_CLIENT")))
-        client = ClientClass()
+        client, ops = load_config(run_config)
         if not client.is_authorized:
             rich.print("[red]Client could not be authenticated. Please ensure you have set NLX_API_KEY.[/red]")
             return
-        OPS = cached_import(run_config, "RUNNER_OPS")
-        not (yes or confirm(f"There are {len(OPS)} OPS defined in this module. Would you like to continue?")) and exit(
+        not (yes or confirm(f"There are {len(ops)} OPS defined in this module. Would you like to continue?")) and exit(
             0
         )
 
-        for method, kwargs in OPS:
+        for method, kwargs in ops:
             op = getattr(client, method)
             op(**kwargs)
 

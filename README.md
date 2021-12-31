@@ -36,7 +36,8 @@ that client class. Custom runner modules must define the following:
 
 Below is an example of a custom runner module (the current revision of which can be found in [./examples/example_run_config.py](./examples/example_run_config.py)).
 To run this example, copy the contents of the runner into a `example_run_config.py` in you current working directory
-and execute the command `nlx run example_run_config`.
+and execute the command `nlx run example_run_config`. To preview the operations that this will run, you can use
+`nlx show_ops example_run_config`
 
 ```python
 """
