@@ -92,3 +92,17 @@ from nlx.client import AsyncReport
 
 assert AsyncReport().is_authorized
 ```
+
+### Build & Publish
+```bash
+# asks for credentials
+poetry publish --build
+
+# OR
+pip install twine
+rm -rf ./dist/
+poetry build
+# uses ~/.pypirc
+twine upload -r testpypi dist/*
+twine upload -r pypi dist/*
+```

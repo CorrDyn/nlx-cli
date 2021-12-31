@@ -1,9 +1,12 @@
 [tool.poetry]
-name = "nlx"
-version = "0.1.0"
+name = "nlx-cli"
+version = "0.1.2"
 description = "Python SDK for interacting with the NLx API and other affiliated tools"
 authors = ["jjorissen52 <jjorissen52@gmail.com>"]
 license = "NO_LICENSE"
+packages = [
+    { include = "nlx" },
+]
 
 [tool.poetry.scripts]
 nlx = "nlx.main:main"

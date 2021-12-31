@@ -23,7 +23,8 @@ STATES = ["KS"]
 RUNNER_OPS = []
 for state in STATES:
     for year in YEARS:
-        # generate twelve months of the arguments for start, end, state, auto
+        # generate twelve months of the arguments for start, end, state, auto.
+        # note that future dates are skipped by generate_year_kwargs.
         for generated_kwargs in helpers.generate_year_kwargs(year, state=state, auto=True):
             # indicate that the kwargs will be passed to RUNNER_CLIENT.create, e.g.
             # nlx.client.AsyncReport().create(**generated_kwargs)
