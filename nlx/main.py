@@ -62,7 +62,7 @@ class Runner:
         :param yes: auto-confirm any prompts
         :return:
         """
-        client, ops, handler = load_config(run_config)
+        client, ops, handler = load_config(str(run_config))
         ops = sliced(ops, offset, limit)
         if not client.is_authorized:
             rich.print("[red]Client could not be authenticated. Please ensure you have set NLX_API_KEY.[/red]")
