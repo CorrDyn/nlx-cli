@@ -8,7 +8,7 @@ import rich
 
 from nlx.client import AsyncReport
 from nlx.conf import settings
-from nlx.utils.misc import basic_logger, confirm
+from nlx.utils.misc import basic_logger, cast, confirm
 from nlx.utils.module_loading import cached_import, import_string
 
 logger = basic_logger(__name__, settings.NLX_LOG_LEVEL)
@@ -23,17 +23,34 @@ def load_config(run_config):
     return client, ops
 
 
+def sliced(container, offset, limit):
+    _offset, offset_valid = cast(offset, int)
+    if offset and not offset_valid:
+        logger.warning(f"Received invalid offset {offset}")
+    start = offset if offset_valid else None
+    _limit, limit_valid = cast(limit, int)
+    if limit and not limit_valid:
+        logger.warning(f"Received invalid limit {offset}")
+    end = None
+    if offset_valid and limit_valid:
+        end = _offset + _limit
+    elif limit_valid:
+        end = _limit
+    return container[start:end]
+
+
 class Runner:
     async_report = AsyncReport
 
     @staticmethod
-    def show_ops(run_config):
+    def show_ops(run_config, offset=None, limit=None):
         _, ops = load_config(run_config)
+        ops = sliced(ops, offset, limit)
         for op in ops:
             print(json.dumps(op))
 
     @staticmethod
-    def run(run_config, yes=False):
+    def run(run_config, yes=False, offset=None, limit=None):
         """
         Execute a python module as a series of API Calls
         :param run_config: python import module path containing the run config
@@ -41,6 +58,7 @@ class Runner:
         :return:
         """
         client, ops = load_config(run_config)
+        ops = sliced(ops, offset, limit)
         if not client.is_authorized:
             rich.print("[red]Client could not be authenticated. Please ensure you have set NLX_API_KEY.[/red]")
             return

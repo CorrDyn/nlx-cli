@@ -13,7 +13,11 @@ def confirm(question, color="cyan"):
 def basic_logger(name, level):
     logger = logging.getLogger(name)
     logger.setLevel(level)
-    logger.addHandler(logging.StreamHandler())
+    handler = logging.StreamHandler()
+    handler.setFormatter(
+        logging.Formatter("[%(levelname)s][%(asctime)s] [%(name)s;%(filename)s:%(lineno)d] - %(message)s")
+    )
+    logger.addHandler(handler)
     return logger
 
 
@@ -50,3 +54,12 @@ class LogLevel:
 
     def __str__(self):
         return str(self.level)
+
+
+def cast(value, func):
+    res = None
+    try:
+        res = func(value)
+    except:  # noqa
+        return res, False
+    return res, True
