@@ -1,7 +1,8 @@
 import functools
 import json
-import logging
 from types import SimpleNamespace
+
+from utils.misc import basic_logger
 
 logger = None
 
@@ -12,9 +13,7 @@ def get_logger():
     if not logger:
         from conf.settings import NLX_LOG_LEVEL
 
-        logger = logging.getLogger(__name__)
-        logger.setLevel(NLX_LOG_LEVEL)
-        logger.addHandler(logging.StreamHandler())
+        logger = basic_logger(__name__, NLX_LOG_LEVEL)
     return logger
 
 

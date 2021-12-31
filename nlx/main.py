@@ -8,8 +8,10 @@ import rich
 
 from nlx.client import AsyncReport
 from nlx.conf import settings
-from nlx.utils.misc import confirm
+from nlx.utils.misc import basic_logger, confirm
 from nlx.utils.module_loading import cached_import, import_string
+
+logger = basic_logger(__name__, settings.NLX_LOG_LEVEL)
 
 
 def load_config(run_config):

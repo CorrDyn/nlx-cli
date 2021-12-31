@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import functools
 import json
-import logging
 import os
 import pickle
 import time
@@ -9,6 +8,7 @@ from pathlib import Path
 
 import fire
 import requests
+from utils.misc import basic_logger
 
 from nlx.conf.settings import (
     NLX_API_KEY,
@@ -20,9 +20,7 @@ from nlx.conf.settings import (
 from nlx.utils.dict_utils import as_json, get_all
 from nlx.utils.settings_utils import ALTERNATE_SEPARATOR
 
-logger = logging.getLogger(__name__)
-logger.setLevel(NLX_LOG_LEVEL)
-logger.addHandler(logging.StreamHandler())
+logger = basic_logger(__name__, NLX_LOG_LEVEL)
 
 
 def format_url(url):
