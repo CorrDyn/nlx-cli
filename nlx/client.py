@@ -3,6 +3,7 @@ import functools
 import json
 import os
 import pickle
+import shutil
 import time
 from pathlib import Path
 
@@ -91,7 +92,11 @@ class AsyncReport(BaseClient):
                 history = pickle.load(history_rb)
         self._history = {"downloads": {}, "created": {}, **history}
 
-    def _save(self, response, creation=None, local_file=None):
+    def _save(self):
+        with open(NLX_REPORT_HISTORY_STORAGE, "wb") as history_wb:
+            pickle.dump(self._history, history_wb)
+
+    def save(self, response, creation=None, local_file=None):
         payload = response["data"][0]
         creation_uuid, creation_args = creation if creation else [None, None]
         update_body = response != self._history.get(payload["uuid"])
@@ -104,8 +109,7 @@ class AsyncReport(BaseClient):
         if update_created:
             self._history["created"][creation_args] = creation_uuid
         if update_body or update_download or update_created:
-            with open(NLX_REPORT_HISTORY_STORAGE, "wb") as history_wb:
-                pickle.dump(self._history, history_wb)
+            self._save()
 
     @as_json
     def history(self, id=None):
@@ -172,7 +176,7 @@ class AsyncReport(BaseClient):
                 logger.error(f"Unexpected {response.status_code}: {json.dumps(response_json, indent=2)}")
                 return response_json
             response = response.json()
-            self._save(response, creation=[response["data"][0]["uuid"], creation_args])
+            self.save(response, creation=[response["data"][0]["uuid"], creation_args])
         if auto:
             return json.loads(self.download(response["data"][0]["uuid"]))
         return response
@@ -210,28 +214,43 @@ class AsyncReport(BaseClient):
             if not _ids:
                 return logger.info("done downloading")
             for id in _ids:
-                existing_filename = self._history["downloads"].get(id, None)
-                existing_download = existing_filename and NLX_REPORT_DOWNLOAD_DIR / existing_filename
-                if existing_download and existing_download.exists():
-                    ids.remove(id)
-                    logger.info(f"skipping download for {id}; already downloaded to {existing_download}")
-                    continue
+                existing_download = self._history["downloads"].get(id, None)
+                existing_download = Path(existing_download)
+                desired_location = NLX_REPORT_DOWNLOAD_DIR / Path(existing_download).name
+                if desired_location:
+                    if desired_location.exists() or existing_download.exists():
+                        # if the file isn't downloaded in the desired location, we move it there.
+                        if existing_download.exists() and desired_location != existing_download:
+                            logger.info(f"{existing_download} detected; relocating to {desired_location}")
+                            os.makedirs(desired_location.parent, exist_ok=True)
+                            shutil.copy(existing_download, desired_location)
+                            os.remove(existing_download)
+                            self._history["downloads"][id] = str(desired_location)
+                            self._save()
+                        ids.remove(id)
+                        logger.info(f"skipping download for {id}; already downloaded to {desired_location}")
+                        continue
                 response = json.loads(self.get_report(id))
-                self._save(response)
+                self.save(response)
                 if response["data"][0]["resource"]["link"]:
                     ids.remove(id)
                     state, start, format, date_column = get_all(
                         response["data"][0]["query"], "state_or_territory", "start", "format", "date_column"
                     )
                     year, month = start[:4], start[5:7]
-                    file_name = Path(f"{state}__{date_column}_{year}_{month}.{format}")
+                    destination = NLX_REPORT_DOWNLOAD_DIR / Path(f"{state}__{date_column}_{year}_{month}.{format}")
                     os.makedirs(NLX_REPORT_DOWNLOAD_DIR, exist_ok=True)
-                    with open(NLX_REPORT_DOWNLOAD_DIR / file_name, "wb") as report_wb:
-                        logger.info(f"downloading report {file_name} ({id})")
-                        for chunk in requests.get(response["data"][0]["resource"]["link"]).iter_content():
-                            report_wb.write(chunk)
-                    report[id] = str(file_name)
-                    self._save(response, local_file=file_name)
+                    try:
+                        with open(destination, "wb") as report_wb:
+                            logger.info(f"downloading report {destination} ({id})")
+                            for chunk in requests.get(response["data"][0]["resource"]["link"]).iter_content():
+                                report_wb.write(chunk)
+                    except:  # noqa
+                        os.remove(destination)
+                        logger.error("encountered error while writing file; cleaning up")
+                        raise
+                    report[id] = str(destination)
+                    self.save(response, local_file=destination)
                 time.sleep(3)
             return True
 
