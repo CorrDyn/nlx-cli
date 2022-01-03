@@ -212,7 +212,7 @@ class AsyncReport(BaseClient):
             for id in _ids:
                 existing_filename = self._history["downloads"].get(id, None)
                 existing_download = existing_filename and NLX_REPORT_DOWNLOAD_DIR / existing_filename
-                if existing_filename and existing_download.exists():
+                if existing_download and existing_download.exists():
                     ids.remove(id)
                     logger.info(f"skipping download for {id}; already downloaded to {existing_download}")
                     continue
